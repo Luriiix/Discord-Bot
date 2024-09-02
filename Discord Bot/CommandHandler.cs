@@ -24,8 +24,7 @@ public class CommandHandler
 
     private async Task HandleCommandAsync(SocketMessage messageParam)
     {
-        var message = messageParam as SocketUserMessage;
-        if (message == null) return;
+        if (messageParam is not SocketUserMessage message) return;
         
         var argPos = 0;
         
@@ -34,15 +33,15 @@ public class CommandHandler
         if (message.HasMentionPrefix(_client.CurrentUser, ref argPos)) return;
 
         var context = new SocketCommandContext(_client, message);
-        await _commands.ExecuteAsync(
-            context: context, 
-            argPos: argPos,
-            services: null);
+        await _commands.ExecuteAsync(context, argPos, null);
 
     }
 }
 
 public class InfoModule : ModuleBase<SocketCommandContext>
 {
-    
+    [Command("say")]
+    [Summary("Echoes a message.")]
+    public Task SayAsync([Remainder] [Summary("The text to echo")] string echo)
+        => ReplyAsync(echo);
 }
