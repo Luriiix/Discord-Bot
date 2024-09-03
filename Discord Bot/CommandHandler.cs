@@ -24,13 +24,13 @@ public class CommandHandler
 
     private async Task HandleCommandAsync(SocketMessage messageParam)
     {
+        await messageParam.Channel.SendMessageAsync(messageParam.Content);
         if (messageParam is not SocketUserMessage message) return;
         
         var argPos = 0;
         
         if (!message.HasCharPrefix('!', ref argPos)) return;
         if (message.Author.IsBot) return;
-        if (message.HasMentionPrefix(_client.CurrentUser, ref argPos)) return;
 
         var context = new SocketCommandContext(_client, message);
         await _commands.ExecuteAsync(context, argPos, null);
