@@ -28,6 +28,7 @@ await client.StartAsync();
 
 client.Ready += GuildCommand;
 client.SlashCommandExecuted += SlashCommandHandler;
+client.ButtonExecuted += MyButtonHandler;
 
 await Task.Delay(-1);
 
@@ -43,19 +44,42 @@ async Task GuildCommand() {
 	var guildCommand = new SlashCommandBuilder()
 		.WithName("test")
 		.WithDescription("Description")
-		.AddOption(new SlashCommandOptionBuilder()
-			.WithName("option1")
-			.WithDescription("description of option1")
-			.WithRequired(true)
-			.AddChoice("top", 1)
-			.AddChoice("flop", 2)
-			.WithType(ApplicationCommandOptionType.Integer)
+		.AddOption(
+			new SlashCommandOptionBuilder()
+				.WithName("option1")
+				.WithDescription("description of option1")
+				.WithRequired(true)
+				.AddChoice("top", 1)
+				.AddChoice("flop", 2)
+				.WithType(ApplicationCommandOptionType.Integer)
 		);
 
 	await guild.CreateApplicationCommandAsync(guildCommand.Build());
 }
 
 async Task SlashCommandHandler(SocketSlashCommand command) {
+	var builder = new ComponentBuilder().WithButton("Hit", "id1");
+
 	await command.DeferAsync();
-	await command.ModifyOriginalResponseAsync(m => { m.Content = "Test [Edited]."; });
+	await command.ModifyOriginalResponseAsync(
+		message => {
+			message.Content = "Loool";
+			message.Components = builder.Build();
+		}
+	);
+}
+
+async Task MyButtonHandler(SocketMessageComponent command) {
+	switch (command.Data.CustomId) {
+		case "id1":
+			await command.DeferAsync();
+			await command.Channel.SendMessageAsync("lol");
+			await command.ModifyOriginalResponseAsync(
+				message => {
+					message.Content = "You won't seem to help here!";
+					message.Components = null;
+				}
+			);
+			break;
+	}
 }
