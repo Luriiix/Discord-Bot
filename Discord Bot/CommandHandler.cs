@@ -24,9 +24,7 @@ public class CommandHandler
 
     private async Task HandleCommandAsync(SocketMessage messageParam)
     {
-        await messageParam.Channel.SendMessageAsync(messageParam.Content);
         if (messageParam is not SocketUserMessage message) return;
-        
         var argPos = 0;
         
         if (!message.HasCharPrefix('!', ref argPos)) return;
@@ -45,3 +43,4 @@ public class InfoModule : ModuleBase<SocketCommandContext>
     public Task SayAsync([Remainder] [Summary("The text to echo")] string echo)
         => ReplyAsync(echo);
 }
+

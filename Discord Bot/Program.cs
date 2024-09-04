@@ -5,7 +5,10 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
-services.AddSingleton(new DiscordSocketConfig(){GatewayIntents = GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.Guilds});
+services.AddSingleton(
+	new DiscordSocketConfig()
+		{ GatewayIntents = GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.Guilds }
+);
 services.AddSingleton<DiscordSocketClient>();
 services.AddSingleton<CommandService>();
 services.AddSingleton<CommandHandler>();
@@ -17,10 +20,14 @@ client.Log += Log;
 const string token = "MTI3OTgzODY3Mjk1MDM5OTA2OQ.GrVZnO.dr0PIqqe5qxCRlzG-xGQqVKAHyQ_B0kkfe3tIQ";
 
 var handler = app.GetRequiredService<CommandHandler>();
+
 await handler.InstallCommandsAsync();
 
 await client.LoginAsync(TokenType.Bot, token);
 await client.StartAsync();
+
+client.Ready += GuildCommand;
+client.SlashCommandExecuted += SlashCommandHandler;
 
 await Task.Delay(-1);
 
@@ -28,4 +35,27 @@ await Task.Delay(-1);
 Task Log(LogMessage msg) {
 	Console.WriteLine(msg);
 	return Task.CompletedTask;
+}
+
+async Task GuildCommand() {
+	var guild = client.GetGuild(703363132126527569);
+
+	var guildCommand = new SlashCommandBuilder()
+		.WithName("test")
+		.WithDescription("Description")
+		.AddOption(new SlashCommandOptionBuilder()
+			.WithName("option1")
+			.WithDescription("description of option1")
+			.WithRequired(true)
+			.AddChoice("top", 1)
+			.AddChoice("flop", 2)
+			.WithType(ApplicationCommandOptionType.Integer)
+		);
+
+	await guild.CreateApplicationCommandAsync(guildCommand.Build());
+}
+
+async Task SlashCommandHandler(SocketSlashCommand command) {
+	await command.DeferAsync();
+	await command.ModifyOriginalResponseAsync(m => { m.Content = "Test [Edited]."; });
 }
