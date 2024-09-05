@@ -12,6 +12,7 @@ services.AddSingleton(
 services.AddSingleton<DiscordSocketClient>();
 services.AddSingleton<CommandService>();
 services.AddSingleton<CommandHandler>();
+services.AddSingleton<Rps>();
 
 var app = services.BuildServiceProvider();
 var client = app.GetRequiredService<DiscordSocketClient>();
@@ -59,8 +60,13 @@ async Task GuildCommand() {
 
 async Task SlashCommandHandler(SocketSlashCommand command) {
 	await command.DeferAsync();
-	var option = command.Data.Options.First().Name;
-	var choice = command.Data.Options.First().Value.ToString();
+	var option = "";
+	var choice = "";
+	
+	if(command.Data.Options.First() != null) option = command.Data.Options.First().Name;
+	if (command.Data.Options.First().Value != null) choice = command.Data.Options.First().Value.ToString();
+	
+	
 	switch (command.CommandName) {
 		
 		case "start":
@@ -73,6 +79,7 @@ async Task SlashCommandHandler(SocketSlashCommand command) {
 							await command.ModifyOriginalResponseAsync(
 								message => message.Content = " You are about to start a game against KI."
 							);
+							app.GetRequiredService<Rps>().RpsGame(command, true);
 							break;
 					}
 
@@ -81,8 +88,6 @@ async Task SlashCommandHandler(SocketSlashCommand command) {
 
 			break;
 	}
-
-	var builder = new ComponentBuilder().WithButton("Hit", "id1");
 }
 
 async Task MyButtonHandler(SocketMessageComponent command) {
