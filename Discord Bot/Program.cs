@@ -75,7 +75,7 @@ async Task SlashCommandHandler(SocketSlashCommand command) {
 				case "rps":
 					switch (choice) {
 						
-						case "against KI":
+					 	case "against KI":
 							await command.ModifyOriginalResponseAsync(
 								message => message.Content = " You are about to start a game against KI."
 							);
@@ -104,3 +104,8 @@ async Task MyButtonHandler(SocketMessageComponent command) {
 			break;
 	}
 }
+
+void WriteMessage(string message)
+ {
+	 
+ }

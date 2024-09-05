@@ -11,7 +11,7 @@ public class Rps {
 	}
 
 	public void RpsGame(SocketSlashCommand command, bool isKiGame) {
-		var builder = new ComponentBuilder().WithButton("Hit", "id1").WithButton("Smash", "id2").WithButton("Burst", "id3");
+		var builder = new ComponentBuilder().WithButton("Rock", "rock").WithButton("Paper", "paper").WithButton("Scissor", "scissor");
 		command.ModifyOriginalResponseAsync(message => message.Components = builder.Build());
 	}
 }
