@@ -42,31 +42,47 @@ async Task GuildCommand() {
 	var guild = client.GetGuild(703363132126527569);
 
 	var guildCommand = new SlashCommandBuilder()
-		.WithName("test")
-		.WithDescription("Description")
+		.WithName("start")
+		.WithDescription("start a Game")
 		.AddOption(
 			new SlashCommandOptionBuilder()
-				.WithName("option1")
-				.WithDescription("description of option1")
+				.WithName("rps")
+				.WithDescription("start rock-paper-scissors")
 				.WithRequired(true)
-				.AddChoice("top", 1)
-				.AddChoice("flop", 2)
-				.WithType(ApplicationCommandOptionType.Integer)
+				.AddChoice("against KI", "against KI")
+				.AddChoice("against other player", "against other player")
+				.WithType(ApplicationCommandOptionType.String)
 		);
 
 	await guild.CreateApplicationCommandAsync(guildCommand.Build());
 }
 
 async Task SlashCommandHandler(SocketSlashCommand command) {
-	var builder = new ComponentBuilder().WithButton("Hit", "id1");
-
 	await command.DeferAsync();
-	await command.ModifyOriginalResponseAsync(
-		message => {
-			message.Content = "Loool";
-			message.Components = builder.Build();
-		}
-	);
+	var option = command.Data.Options.First().Name;
+	var choice = command.Data.Options.First().Value.ToString();
+	switch (command.CommandName) {
+		
+		case "start":
+			switch (option) {
+				
+				case "rps":
+					switch (choice) {
+						
+						case "against KI":
+							await command.ModifyOriginalResponseAsync(
+								message => message.Content = " You are about to start a game against KI."
+							);
+							break;
+					}
+
+					break;
+			}
+
+			break;
+	}
+
+	var builder = new ComponentBuilder().WithButton("Hit", "id1");
 }
 
 async Task MyButtonHandler(SocketMessageComponent command) {
