@@ -15,12 +15,13 @@ public class CreatingSlashCommands
     }
 
     public SlashCommand AddSlashCommand(string name, string description) {
-        return new SlashCommand(name, description, _client);
+        return new SlashCommand(name, description, _client, []);
+        
     }
     
 }
 
-public class SlashCommand(string name, string description, DiscordSocketClient client, SlashCommandOptionBuilder[] options) {
+public class SlashCommand(string name, string description, DiscordSocketClient client, List<SlashCommandOptionBuilder> options){
     public void AddOption(string optionName, string optionDescription, string[] choices, bool isRequired = false, ApplicationCommandOptionType optionType = ApplicationCommandOptionType.String) {
         var option = new SlashCommandOptionBuilder()
             .WithName(optionName)
@@ -31,8 +32,8 @@ public class SlashCommand(string name, string description, DiscordSocketClient c
             option.AddChoice(t, t);
         }
 
-        options.Append(option);
-        Console.WriteLine(options.Length);
+        options.Add(option);
+        Console.WriteLine(options.Count);
     }
 
     public async void Build() {
@@ -40,7 +41,7 @@ public class SlashCommand(string name, string description, DiscordSocketClient c
         var guildCommand = new SlashCommandBuilder()
             .WithName(name)
             .WithDescription(description)
-            .AddOptions(options);
+            .AddOptions(options.ToArray());
         await guild.CreateApplicationCommandAsync(guildCommand.Build());
     }
 }
