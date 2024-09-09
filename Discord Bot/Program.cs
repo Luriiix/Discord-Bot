@@ -13,6 +13,7 @@ services.AddSingleton<DiscordSocketClient>();
 services.AddSingleton<CommandService>();
 services.AddSingleton<CommandHandler>();
 services.AddSingleton<Rps>();
+services.AddSingleton<CreatingSlashCommands>();
 
 var app = services.BuildServiceProvider();
 var client = app.GetRequiredService<DiscordSocketClient>();
@@ -39,23 +40,12 @@ Task Log(LogMessage msg) {
 	return Task.CompletedTask;
 }
 
-async Task GuildCommand() {
-	var guild = client.GetGuild(703363132126527569);
-
-	var guildCommand = new SlashCommandBuilder()
-		.WithName("start")
-		.WithDescription("start a Game")
-		.AddOption(
-			new SlashCommandOptionBuilder()
-				.WithName("rps")
-				.WithDescription("start rock-paper-scissors")
-				.WithRequired(true)
-				.AddChoice("against KI", "against KI")
-				.AddChoice("against other player", "against other player")
-				.WithType(ApplicationCommandOptionType.String)
-		);
-
-	await guild.CreateApplicationCommandAsync(guildCommand.Build());
+Task GuildCommand() {
+	var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
+	var slashCommand = creatingSlashCommands.AddSlashCommand("start", "start a Game");
+	slashCommand.AddOption("rps", "start rock-paper-scissors", ["against KI", "against other player"], true);
+	slashCommand.Build();
+	return Task.CompletedTask;
 }
 
 async Task SlashCommandHandler(SocketSlashCommand command) {
