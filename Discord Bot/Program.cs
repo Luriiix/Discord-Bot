@@ -48,8 +48,7 @@ Task GuildCommand() {
 	return Task.CompletedTask;
 }
 
-async Task SlashCommandHandler(SocketSlashCommand command, Func<int> messageId) {
-	messageId();
+async Task SlashCommandHandler(SocketSlashCommand command) {
 	await command.DeferAsync();
 	var option = "";
 	var choice = "";
