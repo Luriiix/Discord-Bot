@@ -16,14 +16,23 @@ public class CreatingSlashCommands
         _client = client;
     }
 
-    public SlashCommand AddSlashCommand(string name, string description) {
-        return new SlashCommand(name, description, _client, []);
-        
+    public SlashCommand AddSlashCommand(string name, string description, Action<CommandContext, string> action,
+        List<SlashCommandOptionBuilder> options = null)
+    {
+        return new SlashCommand()
+        {
+            Name = name,
+            Description = description,
+            Client = _client,
+            Options = options,
+            Action = action
+
+        };
     }
 
     void RegisterCommands<T>()
     {
-        var commands = new Dictionary<string, Command>();
+        var commands = new Dictionary<string, SlashCommand>();
         var t = typeof(T);
 
         foreach (var methode in t.GetMethods())
@@ -32,19 +41,26 @@ public class CreatingSlashCommands
             if (name == null) continue;
             var description = methode.GetCustomAttribute<DescriptionAttribute>();
             if (description == null) continue;
+
+            var action = new Action(methode.Invoke()); 
             
+            var slashCommand = AddSlashCommand(name.Text, description.Description, action);
+            slashCommand.Build();
             
+            commands.Add(name.Text, slashCommand);
         }
     }
 }
 
-public class SlashCommand(){
+public class SlashCommand()
+{
     public string Name { get; init; }
     public string Description { get; init; }
     public DiscordSocketClient Client { get; init; }
     public List<SlashCommandOptionBuilder> Options { get; init; }
     
     public Action<CommandContext, string> Action { get; init; }
+    
     
     public void AddOption(string optionName, string optionDescription, string[] choices, bool isRequired = false, ApplicationCommandOptionType optionType = ApplicationCommandOptionType.String) {
         var option = new SlashCommandOptionBuilder()
