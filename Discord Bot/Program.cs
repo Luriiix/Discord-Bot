@@ -6,8 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 services.AddSingleton(
-	new DiscordSocketConfig()
-		{ GatewayIntents = GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.Guilds }
+    new DiscordSocketConfig()
+        { GatewayIntents = GatewayIntents.MessageContent | GatewayIntents.GuildMessages | GatewayIntents.Guilds }
 );
 services.AddSingleton<DiscordSocketClient>();
 services.AddSingleton<CommandService>();
@@ -35,67 +35,48 @@ client.ButtonExecuted += MyButtonHandler;
 await Task.Delay(-1);
 
 
-Task Log(LogMessage msg) {
-	Console.WriteLine(msg);
-	return Task.CompletedTask;
+Task Log(LogMessage msg)
+{
+    Console.WriteLine(msg);
+    return Task.CompletedTask;
 }
 
-Task GuildCommand() {
-	var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
-	var slashCommand = creatingSlashCommands.AddSlashCommand("start", "start a Game");
-	slashCommand.AddOption("rps", "start rock-paper-scissors", ["against KI", "against other player"], true);
-	slashCommand.Build();
-	return Task.CompletedTask;
+Task GuildCommand()
+{
+    var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
+    var slashCommand = creatingSlashCommands.RegisterCommands<StartCommand>();
+    slashCommand.Build();
+    return Task.CompletedTask;
 }
 
-async Task SlashCommandHandler(SocketSlashCommand command) {
-	await command.DeferAsync();
-	var option = "";
-	var choice = "";
-	
-	if(command.Data.Options.First() != null) option = command.Data.Options.First().Name;
-	if (command.Data.Options.First().Value != null) choice = command.Data.Options.First().Value.ToString();
-	
-	
-	switch (command.CommandName) {
-		
-		case "start":
-			switch (option) {
-				
-				case "rps":
-					switch (choice) {
-						
-					 	case "against KI":
-							await command.ModifyOriginalResponseAsync(
-								message => message.Content = " You are about to start a game against KI."
-							);
-							app.GetRequiredService<Rps>().RpsGame(command, true);
-							break;
-					}
+async Task SlashCommandHandler(SocketSlashCommand slashCommand)
+{
+    await slashCommand.DeferAsync();
+    var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
+    var commands = creatingSlashCommands.Commands;
 
-					break;
-			}
-
-			break;
-	}
+    var command = commands[slashCommand.CommandName];
+    Console.WriteLine(command.Description);
+    command.Action(new Context(client, slashCommand));
+    await slashCommand.ModifyOriginalResponseAsync(message => message.Content = "lmao");
 }
 
-async Task MyButtonHandler(SocketMessageComponent command) {
-	switch (command.Data.CustomId) {
-		case "id1":
-			await command.DeferAsync();
-			await command.Channel.SendMessageAsync("lol");
-			await command.ModifyOriginalResponseAsync(
-				message => {
-					message.Content = "You won't seem to help here!";
-					message.Components = null;
-				}
-			);
-			break;
-	}
+async Task MyButtonHandler(SocketMessageComponent component)
+{
+    Console.WriteLine(component.Data.CustomId);
+    
+    switch (component.Data.CustomId)
+    {
+        case "id1":
+            await component.DeferAsync();
+            await component.Channel.SendMessageAsync("lol");
+            await component.ModifyOriginalResponseAsync(
+                message =>
+                {
+                    message.Content = "You won't seem to help here!";
+                    message.Components = null;
+                }
+            );
+            break;
+    }
 }
-
-void WriteMessage(string message)
- {
-	 
- }

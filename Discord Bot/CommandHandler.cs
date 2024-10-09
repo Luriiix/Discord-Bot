@@ -26,21 +26,11 @@ public class CommandHandler
     {
         if (messageParam is not SocketUserMessage message) return;
         var argPos = 0;
-        
+
         if (!message.HasCharPrefix('!', ref argPos)) return;
         if (message.Author.IsBot) return;
 
         var context = new SocketCommandContext(_client, message);
         await _commands.ExecuteAsync(context, argPos, null);
-
     }
 }
-
-public class InfoModule : ModuleBase<SocketCommandContext>
-{
-    [Command("say")]
-    [Summary("Echoes a message.")]
-    public Task SayAsync([Remainder] [Summary("The text to echo")] string echo)
-        => ReplyAsync(echo);
-}
-
