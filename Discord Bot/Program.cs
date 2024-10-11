@@ -14,6 +14,8 @@ services.AddSingleton<CommandService>();
 services.AddSingleton<CommandHandler>();
 services.AddSingleton<Rps>();
 services.AddSingleton<CreatingSlashCommands>();
+services.AddSingleton<WriteMessages>();
+services.AddSingleton<CreatingSlashCommands.Parser>();
 
 var app = services.BuildServiceProvider();
 var client = app.GetRequiredService<DiscordSocketClient>();
@@ -44,8 +46,10 @@ Task Log(LogMessage msg)
 Task GuildCommand()
 {
     var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
-    var slashCommand = creatingSlashCommands.RegisterCommands<StartCommand>();
-    slashCommand.Build();
+    var startCommand = creatingSlashCommands.RegisterCommands<StartCommand>();
+    var messageCommand = creatingSlashCommands.RegisterCommands<WriteMessages>();
+    
+    startCommand.Build();
     return Task.CompletedTask;
 }
 
@@ -57,14 +61,13 @@ async Task SlashCommandHandler(SocketSlashCommand slashCommand)
 
     var command = commands[slashCommand.CommandName];
     Console.WriteLine(command.Description);
-    command.Action(new Context(client, slashCommand));
+    command.Action(new Context(client, slashCommand), []);
     await slashCommand.ModifyOriginalResponseAsync(message => message.Content = "lmao");
 }
 
 async Task MyButtonHandler(SocketMessageComponent component)
 {
     Console.WriteLine(component.Data.CustomId);
-    
     switch (component.Data.CustomId)
     {
         case "id1":

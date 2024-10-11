@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Discord;
 using Discord.WebSocket;
 
@@ -9,8 +10,10 @@ public class SlashCommand()
     public string Description { get; init; }
     public DiscordSocketClient Client { get; init; }
     public List<SlashCommandOptionBuilder> Options { get; init; }
+    
+    public Parameter[] Parameters { get; init; }
 
-    public Action<Context> Action { get; init; }
+    public Action<Context, string[]> Action { get; init; }
 
     public void AddOption(string optionName, string optionDescription, string[] choices, bool isRequired = false,
         ApplicationCommandOptionType optionType = ApplicationCommandOptionType.String)
@@ -34,7 +37,7 @@ public class SlashCommand()
         var guildCommand = new SlashCommandBuilder()
             .WithName(Name)
             .WithDescription(Description);
-        guildCommand.AddOptions(Options.ToArray());
+        if(Options != null) guildCommand.AddOptions(Options.ToArray());
         await guild.CreateApplicationCommandAsync(guildCommand.Build());
     }
 }
