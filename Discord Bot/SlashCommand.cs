@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Reflection.Metadata;
 using Discord;
 using Discord.WebSocket;
@@ -13,7 +14,7 @@ public class SlashCommand()
     
     public Parameter[] Parameters { get; init; }
 
-    public Action<Context, string[]> Action { get; init; }
+    public Action<Context> Action { get; init; }
 
     public void AddOption(string optionName, string optionDescription, string[] choices, bool isRequired = false,
         ApplicationCommandOptionType optionType = ApplicationCommandOptionType.String)
@@ -28,7 +29,6 @@ public class SlashCommand()
             option.AddChoice(t, t);
         }
         Options.Add(option);
-        Console.WriteLine(Options.Count);
     }
 
     public async void Build()

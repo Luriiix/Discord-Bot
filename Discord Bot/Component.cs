@@ -10,10 +10,10 @@ public class Component
 
     public void AddButton(string label, ButtonStyle buttonStyle = ButtonStyle.Primary, bool disabled = false, IEmote emote = null)
     {
-	    var action = new Action<SocketMessageComponent>((component) =>
-	    {
-		    
-	    });
+	    // var action = (component) =>
+	    // {
+		   //  
+	    // });
 	    
 	    var button = Tuple.Create(label, buttonStyle, disabled, emote);
 	    Buttons.Add(button);

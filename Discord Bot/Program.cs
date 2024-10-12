@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord_Bot;
 using Discord.Commands;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +16,6 @@ services.AddSingleton<CommandHandler>();
 services.AddSingleton<Rps>();
 services.AddSingleton<CreatingSlashCommands>();
 services.AddSingleton<WriteMessages>();
-services.AddSingleton<CreatingSlashCommands.Parser>();
 
 var app = services.BuildServiceProvider();
 var client = app.GetRequiredService<DiscordSocketClient>();
@@ -45,6 +45,7 @@ Task Log(LogMessage msg)
 
 Task GuildCommand()
 {
+    Parser.AddAllParsers();
     var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
     var startCommand = creatingSlashCommands.RegisterCommands<StartCommand>();
     var messageCommand = creatingSlashCommands.RegisterCommands<WriteMessages>();
@@ -53,21 +54,25 @@ Task GuildCommand()
     return Task.CompletedTask;
 }
 
-async Task SlashCommandHandler(SocketSlashCommand slashCommand)
-{
+async Task SlashCommandHandler(SocketSlashCommand slashCommand) {
+    var commandMessage = "!lol (HalLoooooooo)";
+    
     await slashCommand.DeferAsync();
     var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
     var commands = creatingSlashCommands.Commands;
-
+    
     var command = commands[slashCommand.CommandName];
-    Console.WriteLine(command.Description);
-    command.Action(new Context(client, slashCommand), []);
+    command.Action(new Context(client, slashCommand, commandMessage));
+    
     await slashCommand.ModifyOriginalResponseAsync(message => message.Content = "lmao");
 }
 
 async Task MyButtonHandler(SocketMessageComponent component)
 {
     Console.WriteLine(component.Data.CustomId);
+    // Buttonacctions[customid] = button;
+    // button.action;
+        
     switch (component.Data.CustomId)
     {
         case "id1":
@@ -83,3 +88,4 @@ async Task MyButtonHandler(SocketMessageComponent component)
             break;
     }
 }
+

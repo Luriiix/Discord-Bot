@@ -6,10 +6,10 @@ namespace Discord_Bot;
 [Command("writemessage", "Writes a Message")]
 public class WriteMessages
 {
-    public void WriteMessageInChannel(Context context)
+    public void WriteMessageInChannel(Context context, string message)
     {
         var channel = context.GetCommand().Channel;
-        channel.SendMessageAsync(embed: EmbedBuilder(context.GetCommand().User, Color.Blue));
+        channel.SendMessageAsync(message, embed: EmbedBuilder(context.GetCommand().User, Color.Blue));
     }
 
     private Embed EmbedBuilder(SocketUser user, Color color, string title = null, string text = null)
