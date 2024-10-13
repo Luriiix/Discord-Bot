@@ -8,15 +8,13 @@ namespace Discord_Bot;
 
 public class CreatingSlashCommands {
 	private readonly DiscordSocketClient _client;
-	public Dictionary<string, SlashCommand> Commands { get; private set; }
+	public Dictionary<string, SlashCommand> Commands { get; set; }
 
 	public CreatingSlashCommands(DiscordSocketClient client) {
 		_client = client;
 	}
 
 	public SlashCommand RegisterCommands<T>() {
-		Commands = new Dictionary<string, SlashCommand>();
-
 		var type = typeof(T);
 		var commandAttribute = type.GetCustomAttribute<CommandAttribute>();
 		if (commandAttribute == null)
@@ -52,7 +50,9 @@ public class CreatingSlashCommands {
 				if (methode == null) throw new NullReferenceException();
 
 				argList.Add(Parser.ParseMessageToParameters(context.Message, methode.GetParameters()));
-
+				foreach (var s in argList) {
+					Console.WriteLine(s);
+				}
 				methode.Invoke(classObject, argList.ToArray());
 				return;
 			}
@@ -76,7 +76,6 @@ public class CreatingSlashCommands {
 		}
 
 		slashCommand.Build();
-		Console.WriteLine(name);
 		Commands.Add(name, slashCommand);
 		return slashCommand;
 	}

@@ -21,7 +21,7 @@ var app = services.BuildServiceProvider();
 var client = app.GetRequiredService<DiscordSocketClient>();
 client.Log += Log;
 
-const string token = "MTI3OTgzODY3Mjk1MDM5OTA2OQ.GrVZnO.dr0PIqqe5qxCRlzG-xGQqVKAHyQ_B0kkfe3tIQ";
+var token = await File.ReadAllTextAsync("C:\\Users\\lurix\\RiderProjects\\Guide Projects\\Discord-Bot\\Discord Bot\\token.txt");
 
 var handler = app.GetRequiredService<CommandHandler>();
 
@@ -47,6 +47,7 @@ Task GuildCommand()
 {
     Parser.AddAllParsers();
     var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
+    creatingSlashCommands.Commands = new Dictionary<string, SlashCommand>();
     var startCommand = creatingSlashCommands.RegisterCommands<StartCommand>();
     var messageCommand = creatingSlashCommands.RegisterCommands<WriteMessages>();
     
@@ -55,14 +56,14 @@ Task GuildCommand()
 }
 
 async Task SlashCommandHandler(SocketSlashCommand slashCommand) {
-    var commandMessage = "!lol (HalLoooooooo)";
+    //var commandMessage = "!lol (HalLoooooooo)";
     
     await slashCommand.DeferAsync();
     var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
     var commands = creatingSlashCommands.Commands;
     
     var command = commands[slashCommand.CommandName];
-    command.Action(new Context(client, slashCommand, commandMessage));
+    command.Action(new Context(client, slashCommand, ""));
     
     await slashCommand.ModifyOriginalResponseAsync(message => message.Content = "lmao");
 }
