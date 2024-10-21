@@ -21,7 +21,21 @@ var app = services.BuildServiceProvider();
 var client = app.GetRequiredService<DiscordSocketClient>();
 client.Log += Log;
 
-var token = await File.ReadAllTextAsync("C:\\Users\\lurix\\RiderProjects\\Discord Bot\\Discord Bot\\token.txt");
+var path = @"..\..\..\token.txt";
+
+if (!File.Exists(path)) {
+    string input;
+    while (true) {
+        Console.Write("Please enter the token of the Bot you want to run: ");
+        input = Console.ReadLine();
+        if (input == null) continue;
+        break;
+    }
+    await using var writer = File.CreateText(path);
+    await writer.WriteAsync(input);
+}
+var token = await File.ReadAllTextAsync(path);
+
 
 var handler = app.GetRequiredService<CommandHandler>();
 
@@ -57,11 +71,6 @@ Task GuildCommand()
 
 async Task SlashCommandHandler(SocketSlashCommand slashCommand) {
     //var commandMessage = "!lol (HalLoooooooo)";
-    var component = new Component();
-    var button = new CreatingButtons().RegisterButton("label");
-    component.AddButton(button);
-    await button.CustomTask;
-    if (button.CustomTask.IsCompletedSuccessfully) Console.WriteLine("juhuuuuuuuuuuuuuuuuu");
     
     await slashCommand.DeferAsync();
     var creatingSlashCommands = app.GetRequiredService<CreatingSlashCommands>();
