@@ -7,15 +7,15 @@ namespace Discord_Bot;
 [Option("game", "Choose a Game", true)]
 public class StartCommand
 {
-    [Choice("RockPaperSiccors")]
+    [Choice("Rps")]
     public async Task Rps(Context context)
     {
         Console.WriteLine("Started Rps Game");
         var command = context.GetCommand();
         
         var component = new Component();
-        component.AddButton("Against Player");
-        component.AddButton("Against KI");
+        var button = new CreatingButtons().RegisterButton("label");
+        component.AddButton(button);
         var messageComponent = component.Build();
         await command.ModifyOriginalResponseAsync(message =>
         {

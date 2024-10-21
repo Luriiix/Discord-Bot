@@ -11,9 +11,6 @@ public class SlashCommand()
     public string Description { get; init; }
     public DiscordSocketClient Client { get; init; }
     public List<SlashCommandOptionBuilder> Options { get; init; }
-    
-    public Parameter[] Parameters { get; init; }
-
     public Action<Context> Action { get; init; }
 
     public void AddOption(string optionName, string optionDescription, string[] choices, bool isRequired = false,
